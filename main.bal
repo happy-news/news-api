@@ -2,7 +2,7 @@ import ballerina/http;
 import ballerina/sql;
 import ballerinax/postgresql;
 import ballerina/os;
-
+import ballerina/io;
 
 listener http:Listener httpListener = new(9090);
 
@@ -15,7 +15,7 @@ service /newsAPI on httpListener {
         string dbPassword =  os:getEnv("DB_PASSWORD");
         string dbName =  os:getEnv("DB_NAME");
         
-
+        io:print(dbHost);
         // MySQL client configuration
         postgresql:Client dbClient = check new(
             dbHost,
