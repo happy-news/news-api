@@ -21,7 +21,8 @@ service /newsAPI on httpListener {
             dbHost,
             dbUsername,
             dbPassword,
-            dbName
+            dbName,
+            25059
         );
         sql:ParameterizedQuery query = `SELECT id, title, news, image_url, url, category_id FROM news`;
         // Select query
