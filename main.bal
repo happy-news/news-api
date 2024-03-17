@@ -15,7 +15,7 @@ service /newsAPI on httpListener {
         string dbPassword =  os:getEnv("DB_PASSWORD");
         string dbName =  os:getEnv("DB_NAME");
         
-        io:print(dbHost);
+        io:print(`Database host is ${dbHost}`);
         // MySQL client configuration
         postgresql:Client dbClient = check new(
             dbHost,
