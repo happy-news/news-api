@@ -35,7 +35,7 @@ service /newsAPI on httpListener {
 
     resource function get categories() returns json|error {
         postgresql:Client dbClient = check createDbClient();
-        sql:ParameterizedQuery query = `SELECT id, category FROM categories`;
+        sql:ParameterizedQuery query = `SELECT id, category, image_url FROM categories`;
         stream<Category, sql:Error?> resultStream = dbClient->query(query);
         json[] categoriesArray = [];
         check from Category category in resultStream
@@ -82,6 +82,7 @@ function closeDbClient(postgresql:Client dbClient) returns error? {
 type Category record {
     int id;
     string category;
+    string image_url;
 };
 
 type News record {
