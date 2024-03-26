@@ -5,6 +5,19 @@ import ballerina/os;
 
 listener http:Listener httpListener = new(9090);
 
+// Define CORS configuration
+http:CorsConfig corsConfig = {
+    allowOrigins: ["*"], // Allow all origins
+    allowCredentials: true, // Allow credentials
+    allowHeaders: ["*"], // Allow all headers
+    exposeHeaders: ["*"], // Expose all headers
+    allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"] // Allow these methods
+};
+
+@http:ServiceConfig {
+    cors: corsConfig
+}
+
 service /newsAPI on httpListener {
 
     resource function get news() returns json|error {
@@ -31,6 +44,24 @@ service /newsAPI on httpListener {
         };
         check closeDbClient(dbClient);
         return categoriesArray;
+    }
+
+    resource function get newsByCategory/[int categoryId](int? newsCount = ()) returns json|error {
+        postgresql:Client dbClient = check createDbClient();
+        sql:ParameterizedQuery query;
+        if newsCount is int {
+            query = `SELECT id, title, news, image_url, url, category_id FROM news WHERE category_id = ${categoryId} LIMIT ${newsCount}`;
+        } else {
+            query = `SELECT id, title, news, image_url, url, category_id FROM news WHERE category_id = ${categoryId}`;
+        }
+        stream<News, sql:Error?> resultStream = dbClient->query(query);
+        json[] newsArray = [];
+        check from News news in resultStream
+        do {
+            newsArray.push(news.toJson());
+        };
+        check closeDbClient(dbClient);
+        return newsArray;
     }
 }
 
