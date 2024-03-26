@@ -50,9 +50,9 @@ service /newsAPI on httpListener {
         postgresql:Client dbClient = check createDbClient();
         sql:ParameterizedQuery query;
         if newsCount is int {
-            query = `SELECT id, title, news, image_url, url, category_id FROM news WHERE category_id = ${categoryId} LIMIT ${newsCount}`;
+            query = `SELECT * FROM (SELECT DISTINCT ON (title) id, title, news, image_url, url, category_id FROM news WHERE category_id = ${categoryId} ORDER BY title, id DESC) subquery LIMIT ${newsCount}`;
         } else {
-            query = `SELECT id, title, news, image_url, url, category_id FROM news WHERE category_id = ${categoryId}`;
+            query = `SELECT DISTINCT ON (title) id, title, news, image_url, url, category_id FROM news WHERE category_id = ${categoryId} ORDER BY title, id DESC`;
         }
         stream<News, sql:Error?> resultStream = dbClient->query(query);
         json[] newsArray = [];
